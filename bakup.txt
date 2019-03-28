@@ -1,0 +1,125 @@
+#include <iostream>
+#include <stdlib.h>
+#include <unistd.h>
+#include <time.h>
+#include <math.h>
+#include <signal.h>
+#include <csignal>
+#include "semaphores.h"
+
+#define PRINT_JOBS 25
+#define MIN_DELAY 100
+#define MAX_DELAY 1000
+#define MIN_REQUEST_SIZE 100
+#define MAX_REQUEST_SIZE 1000
+
+using namespace std;
+
+struct PrintRequest{
+    int jobSize;
+    char data[MAX_REQUEST_SIZE];
+};
+
+void delayRandom();
+int getRndJobs();
+int generateRequestSize();
+int main(int argc, char **args);
+void printer(int id);
+void consumer(int id);
+void onExit(sig_t sig);
+
+
+PrintRequest printerQueue[PRINT_JOBS];
+long int randseed;
+Sema queueFullSem;
+Sema queueEmptySem;
+Sema rwSem;-
+int pRun = 1;
+
+
+void delayRandom()
+{
+    usleep((MIN_DELAY + random() * (MIN_DELAY - MAX_DELAY)));
+}
+
+int getRndJobs()
+{
+    return round(random() * 30);
+}
+
+int generateRequestSize()
+{
+    return MIN_REQUEST_SIZE + round(random() * 
+        (MIN_REQUEST_SIZE - MAX_REQUEST_SIZE));
+}
+
+void initSems()
+{
+    
+    
+}
+
+
+/**
+*Command line paramaters:
+*1 - Number of producers(user) processes
+*2 - number of printer(consumer) threads
+**/
+int main(int argc, char **args)
+{
+    int producers, printers;
+    if(argc > 3)
+    {
+        cout << "Too many arguments!\n";
+        exit(-1);
+    }
+    
+    if(argc < 3)
+    {
+        cout << "Not enough arguments!\n";
+        exit(-1);
+    }
+    
+    //Set producers and consumers count
+    producers = stoi(args[1]);
+    printers = stoi(args[2]);
+    
+    if(producers <= 0 || printers <= 0)
+    {
+        cout << "Invalid input!\n";
+        exit(-1);
+    }
+    cout << "Printer server starting...\n";
+    //Detect Ctrl+C
+    //signal(SIGINT, &onExit);
+    
+    //Initalize printer queue
+    //printerQueue = (PrintRequest*)malloc(sizeof(printerQueue));
+    
+    randseed = static_cast<long int>(time(0)); //Set random seed for threads and processes
+    srand(randseed);
+    initSem(queueFullSem);
+    initSem(queueEmptySem);
+    initSem(rwSem);
+}
+
+
+void onExit(sig_t sig)
+{
+    cout << "Exiting printer server.\n";
+    exit(1);
+}
+
+void printer(int id) //Consumer
+{
+    srand(randseed + id);
+    while(pRun)
+    {
+        
+    }
+}
+
+void producer(int id)
+{
+    srand(randseed + 10000000 + id);
+}
